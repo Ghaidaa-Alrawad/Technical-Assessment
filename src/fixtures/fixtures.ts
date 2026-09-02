@@ -10,9 +10,10 @@ import {
  * Custom Playwright fixtures that instantiate the Page Objects once per test
  * and inject them automatically — tests never manually `new` a page object.
  *
- * Two lifecycle concerns are handled here too:
- *  - _maximisedPage : guarantees the browser window opens fully maximised
- *    (belt-and-braces on top of `viewport:null` + `--start-maximized`).
+ * Two lifecycle concerns handled here:
+ *  - _maximisedPage : guarantees the browser window opens fully maximised.
+ *    Chromium is maximised via `viewport:null` + `--start-maximized`; Firefox
+ *    ignores those, so its window is sized to the real screen resolution here.
  *  - _closeAfterSuite : explicitly closes the browser once the worker's last
  *    test has finished.
  */
@@ -30,25 +31,26 @@ type WorkerFixtures = {
   _closeAfterSuite: void;
 };
 
-/** Force the browser window to fill the available screen (headed mode). */
+/** Detect the available screen area and size the window/viewport to fill it. */
 async function maximiseWindow(page: Page): Promise<void> {
   try {
-    const size = await page.evaluate(() => {
+    const screen = await page.evaluate(() => {
       const win = globalThis as unknown as {
-        moveTo: (x: number, y: number) => void;
-        resizeTo: (w: number, h: number) => void;
         screen?: { availWidth: number; availHeight: number };
       };
-      if (win.screen) {
-        win.moveTo(0, 0);
-        win.resizeTo(win.screen.availWidth, win.screen.availHeight);
-        return { width: win.screen.availWidth, height: win.screen.availHeight };
-      }
-      return { width: 0, height: 0 };
+      return {
+        width: win.screen?.availWidth ?? 0,
+        height: win.screen?.availHeight ?? 0,
+      };
     });
-    console.log(`[WINDOW] maximised -> ${size.width}x${size.height}`);
+    if (screen.width && screen.height) {
+      // Works when a viewport is set (Firefox). Chromium uses viewport:null +
+      // --start-maximized already, so setViewportSize throws here -> caught.
+      await page.setViewportSize({ width: screen.width, height: screen.height });
+      console.log(`[WINDOW] maximised -> ${screen.width}x${screen.height}`);
+    }
   } catch (error) {
-    console.log(`[WINDOW] maximise skipped (${(error as Error).message})`);
+    console.log(`[WINDOW] maximised via launch flags/skip (${(error as Error).message})`);
   }
 }
 
@@ -59,8 +61,9 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
       console.log('[WINDOW] closing browser after last test finishes');
       try {
         await browser.close();
-      } catch {
-        console.log('[WINDOW] browser was already closed');
+        console.log(`[WINDOW] browser closed (isConnected=${browser.isConnected()})`);
+      } catch (error) {
+        console.log(`[WINDOW] browser close threw (${(error as Error).message})`);
       }
     },
     { scope: 'worker' },
