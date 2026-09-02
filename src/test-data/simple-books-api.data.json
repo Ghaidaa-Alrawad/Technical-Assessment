@@ -1,0 +1,29 @@
+{
+  "baseUrl": "https://simple-books-api.click",
+  "status": {
+    "endpoint": "/status",
+    "expectedStatus": "OK"
+  },
+  "apiClient": {
+    "clientName": "Ghaidaa Al Rawad",
+    "emailDomain": "@interview.example.com"
+  },
+  "newOrder": {
+    "bookId": 1,
+    "bookName": "The Russian",
+    "customerName": "Ghaidaa Al Rawad"
+  },
+  "availableBooks": [
+    { "id": 1, "name": "The Russian", "type": "fiction", "available": true },
+    { "id": 3, "name": "The Vanishing Half", "type": "fiction", "available": true },
+    { "id": 4, "name": "The Midnight Library", "type": "fiction", "available": true },
+    { "id": 6, "name": "Viscount Who Loved Me", "type": "fiction", "available": true },
+    { "id": 5, "name": "Untamed", "type": "non-fiction", "available": true }
+  ],
+  "expectedStatusCodes": {
+    "created": 201,
+    "ok": 200,
+    "noContent": 204,
+    "notFound": 404
+  }
+}
