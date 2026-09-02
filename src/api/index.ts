@@ -1,5 +1,6 @@
 export {
   SimpleBooksApiClient,
+  type ApiResponse,
   type ClientRegistration,
   type CreatedOrder,
   type OrderDetails,
