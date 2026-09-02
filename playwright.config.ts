@@ -1,4 +1,5 @@
 import { defineConfig } from '@playwright/test';
+import apiData from './src/test-data/simple-books-api.data.json';
 
 // Desktop device presets set a fixed viewport + deviceScaleFactor, which is
 // incompatible with our maximised-window requirement (viewport: null). We
@@ -6,6 +7,11 @@ import { defineConfig } from '@playwright/test';
 // launch flag so the browser window opens fully maximised.
 const maximizeChromium = { args: ['--start-maximized'] };
 const maximizeFirefox = { args: ['--start-maximized'] };
+
+// The Simple Books API test file is a pure API suite: it must run exactly once
+// (not once per browser). Give it its own project and exclude it from the UI
+// browser projects.
+const APIS = '**/api/**';
 
 /**
  * Playwright configuration for the Technical Assessment framework.
@@ -56,21 +62,30 @@ export default defineConfig({
   },
 
   projects: [
-      {
-        name: 'chromium',
-        use: {
-          browserName: 'chromium',
-          viewport: null,
-          launchOptions: maximizeChromium,
+        {
+          name: 'chromium',
+          testIgnore: APIS,
+          use: {
+            browserName: 'chromium',
+            viewport: null,
+            launchOptions: maximizeChromium,
+          },
         },
-      },
-      {
-        name: 'firefox',
-        use: {
-          browserName: 'firefox',
-          viewport: null,
-          launchOptions: maximizeFirefox,
+        {
+          name: 'firefox',
+          testIgnore: APIS,
+          use: {
+            browserName: 'firefox',
+            viewport: null,
+            launchOptions: maximizeFirefox,
+          },
         },
-      },
-    ],
+        {
+          name: 'api',
+          testMatch: APIS,
+          use: {
+            baseURL: apiData.baseUrl,
+          },
+        },
+      ],
 });
