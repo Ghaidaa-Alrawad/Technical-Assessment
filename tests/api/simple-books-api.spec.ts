@@ -2,10 +2,14 @@ import { expect } from '../../src/fixtures/api.fixtures';
 import { apiTest as test } from '../../src/fixtures/api.fixtures';
 import apiData from '../../src/test-data/simple-books-api.data.json';
 import { randomEmail } from '../../src/utils/random-data';
+import { printPayload } from '../../src/utils/print';
 
 /**
  * Simple Books API scenarios (test data from external JSON + dynamically
  * generated client email).
+ *
+ * Every request/response payload is printed to the console (see `printPayload`),
+ * so the data is visible right in the terminal output.
  *
  * NOTE — TC_API_001 and TC_API_002 share state (token + orderId) and MUST run
  * together, serially in the same worker. `mode: 'serial'` guarantees this.
@@ -23,10 +27,19 @@ test.describe('Simple Books API', () => {
   }) => {
     // 1. Register a client with a dynamic email to obtain a Bearer token.
     const clientEmail = randomEmail('qa', apiData.apiClient.emailDomain);
+    printPayload('REQ  POST /api-clients', {
+      clientName: apiData.apiClient.clientName,
+      clientEmail,
+    });
+
     const registered = await apiClient.registerApiClient(
       apiData.apiClient.clientName,
       clientEmail,
     );
+    printPayload('RES  POST /api-clients', {
+      status: registered.status,
+      body: registered.body,
+    });
 
     expect(registered.status, 'client registration should be 201 Created').toBe(
       apiData.expectedStatusCodes.created,
@@ -37,11 +50,20 @@ test.describe('Simple Books API', () => {
     accessToken = registered.body.accessToken;
 
     // 2. Create an order using the token with a valid bookId + customerName.
+    printPayload('REQ  POST /orders', {
+      Authorization: `Bearer ${accessToken.slice(0, 8)}... (masked)`,
+      bookId: apiData.newOrder.bookId,
+      customerName: apiData.newOrder.customerName,
+    });
     const created = await apiClient.createOrder(
       accessToken,
       apiData.newOrder.bookId,
       apiData.newOrder.customerName,
     );
+    printPayload('RES  POST /orders', {
+      status: created.status,
+      body: created.body,
+    });
 
     expect(created.status, 'order creation should be 201 Created').toBe(
       apiData.expectedStatusCodes.created,
@@ -55,7 +77,15 @@ test.describe('Simple Books API', () => {
 
   test('TC_API_002 - GET /orders/:orderId returns the created order', async ({ apiClient }) => {
     // Fetch the order created in TC_API_001.
+    printPayload('REQ  GET /orders/:orderId', {
+      Authorization: `Bearer ${accessToken.slice(0, 8)}... (masked)`,
+      orderId,
+    });
     const order = await apiClient.getOrder(accessToken, orderId);
+    printPayload('RES  GET /orders/:orderId', {
+      status: order.status,
+      body: order.body,
+    });
 
     expect(order.status, 'fetching the order should be 200 OK').toBe(
       apiData.expectedStatusCodes.ok,
