@@ -35,11 +35,14 @@ export default defineConfig({
   outputDir: './reports/test-results',
 
   timeout: 60_000,
-  expect: { timeout: 10_000 },
-  fullyParallel: true,
+    expect: { timeout: 10_000 },
+    // Run in a clean, ordered sequence (one test at a time) instead of many
+    // tests/windows in parallel. CI still uses workers for speed.
+    fullyParallel: false,
 
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 4 : undefined,
+    retries: process.env.CI ? 2 : 0,
+    // 1 worker locally => tests run strictly in order, one browser at a time.
+    workers: process.env.CI ? 4 : 1,
 
   reporter: [
     ['list'],
