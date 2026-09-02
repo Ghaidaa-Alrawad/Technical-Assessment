@@ -53,10 +53,12 @@ export class CheckoutPage extends BasePage {
   }
 
   /** "Item total" shown on the overview, parsed to a number. */
-  async getItemsTotal(): Promise<number> {
-    const text = (await this.subtotalValue.textContent()) ?? '$0';
-    return parseFloat(text.replace(/\D/g, ''));
-  }
+    async getItemsTotal(): Promise<number> {
+      const text = (await this.subtotalValue.textContent()) ?? '$0';
+      const match = /\$([\d,.]+)/.exec(text);
+      const amount = match ? parseFloat(match[1].replace(/,/g, '')) : 0;
+      return amount;
+    }
 
   /** Click Finish to place the order. */
   async finishOrder(): Promise<void> {

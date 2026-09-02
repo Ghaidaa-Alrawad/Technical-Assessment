@@ -1,4 +1,11 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
+
+// Desktop device presets set a fixed viewport + deviceScaleFactor, which is
+// incompatible with our maximised-window requirement (viewport: null). We
+// therefore define projects explicitly and pair viewport:null with a
+// launch flag so the browser window opens fully maximised.
+const maximizeChromium = { args: ['--start-maximized'] };
+const maximizeFirefox = { args: ['--start-maximized'] };
 
 /**
  * Playwright configuration for the Technical Assessment framework.
@@ -49,21 +56,21 @@ export default defineConfig({
   },
 
   projects: [
-    {
-      name: 'chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-        viewport: null,
-        launchOptions: { args: ['--start-maximized'] },
+      {
+        name: 'chromium',
+        use: {
+          browserName: 'chromium',
+          viewport: null,
+          launchOptions: maximizeChromium,
+        },
       },
-    },
-    {
-      name: 'firefox',
-      use: {
-        ...devices['Desktop Firefox'],
-        viewport: null,
-        launchOptions: { args: ['--start-maximized'] },
+      {
+        name: 'firefox',
+        use: {
+          browserName: 'firefox',
+          viewport: null,
+          launchOptions: maximizeFirefox,
+        },
       },
-    },
-  ],
+    ],
 });
