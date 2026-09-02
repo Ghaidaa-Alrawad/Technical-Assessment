@@ -53,9 +53,11 @@ Technical-Assessment/
 │  │  ├─ login.page.ts       #   SauceDemo login form + error handling
 │  │  ├─ products.page.ts    #   inventory + add-to-cart + dynamic price logic
 │  │  ├─ cart.page.ts        #   shopping cart
-│  │  └─ checkout.page.ts    #   checkout info form + summary + totals + finish
+│  │  ├─ checkout.page.ts    #   checkout info form + summary + totals + finish
+│  │  └─ index.ts            #   barrel re-exporting all page objects
 │  ├─ api/
-│  │  └─ simple-books-api.client.ts  # Simple Books API client (register, orders)
+│  │  ├─ simple-books-api.client.ts  # Simple Books API client (register, orders)
+│  │  └─ index.ts                    # barrel re-exporting the client + types
 │  ├─ utils/
 │  │  ├─ random-data.ts      # random strings / emails / numbers (dynamic data)
 │  │  └─ print.ts            # pretty-print request/response payloads
