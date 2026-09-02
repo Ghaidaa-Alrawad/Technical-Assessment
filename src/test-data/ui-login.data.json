@@ -1,0 +1,27 @@
+{
+  "validUser": {
+    "username": "standard_user",
+    "password": "secret_sauce",
+    "expectedPageTitle": "Products"
+  },
+  "invalidLoginScenarios": [
+    {
+      "name": "no username",
+      "username": "",
+      "password": "secret_sauce",
+      "expectedError": "Epic sadface: Username is required"
+    },
+    {
+      "name": "no password",
+      "username": "standard_user",
+      "password": "",
+      "expectedError": "Epic sadface: Password is required"
+    },
+    {
+      "name": "invalid credentials",
+      "username": "tester",
+      "password": "wrong-password",
+      "expectedError": "Epic sadface: Username and password do not match any user in this service"
+    }
+  ]
+}
