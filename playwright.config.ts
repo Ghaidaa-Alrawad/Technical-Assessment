@@ -37,6 +37,8 @@ export default defineConfig({
 
   use: {
     baseURL: 'https://www.saucedemo.com',
+    // SauceDemo marks its elements with data-test (not data-testid).
+    testIdAttribute: 'data-test',
     // null + --start-maximized => browser owns its window size (maximised).
     viewport: null,
     screenshot: 'only-on-failure',
