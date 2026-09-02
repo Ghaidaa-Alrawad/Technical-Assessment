@@ -81,11 +81,16 @@ export default defineConfig({
           },
         },
         {
-          name: 'api',
-          testMatch: APIS,
-          use: {
-            baseURL: apiData.baseUrl,
-          },
-        },
+                name: 'api',
+                testMatch: APIS,
+                use: {
+                  baseURL: apiData.baseUrl,
+                  // Always record a trace for API tests so every HTTP request/response
+                  // payload is inspectable in the HTML report / trace viewer.
+                  trace: 'on',
+                  screenshot: 'off',
+                  video: 'off',
+                },
+              },
       ],
 });
